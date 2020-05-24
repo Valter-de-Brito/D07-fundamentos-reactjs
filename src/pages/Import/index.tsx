@@ -1,3 +1,5 @@
+/* eslint-disable no-alert */
+/* eslint-disable no-restricted-globals */
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -23,19 +25,31 @@ const Import: React.FC = () => {
   const history = useHistory();
 
   async function handleUpload(): Promise<void> {
-    // const data = new FormData();
+    const data = new FormData();
+    const file = uploadedFiles[0]; // Single file - first position
 
-    // TODO
+    data.append('file', file.file, file.name);
 
     try {
-      // await api.post('/transactions/import', data);
+      await api.post('/transactions/import', data);
+      if (confirm('Would you want to upload another file') === true) {
+        return;
+      }
+      history.push('/');
     } catch (err) {
-      // console.log(err.response.error);
+      // eslint-disable-next-line no-console
+      console.log(err.response.error);
     }
   }
 
   function submitFile(files: File[]): void {
-    // TODO
+    const uploadFile: FileProps[] = files.map(file => ({
+      file,
+      name: file.name,
+      readableSize: filesize(file.size),
+    }));
+
+    setUploadedFiles(uploadFile);
   }
 
   return (
